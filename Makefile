@@ -66,6 +66,9 @@ e2evvv: e2ev
 e2evvvv: TEST_ENV += TEST_LOGS=3
 e2evvvv: e2ev
 
+e2e-bench: TEST_FLAGS = -bench=. -benchmem -run=^$
+e2e-bench: e2e
+
 all: $(ALL:%=build/%/oneclick-agent) $(ALL:%=build/%/oneclick-agent-cert)
 
 release: $(ALL:%=build/oneclick-agent-%.tar.gz)
