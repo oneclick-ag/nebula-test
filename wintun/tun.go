@@ -50,7 +50,7 @@ type NativeTun struct {
 	close     int32
 }
 
-var WintunTunnelType = "Oneclick Agent"
+var WintunTunnelType = "oneclick Mesh Client"
 var WintunStaticRequestedGUID *windows.GUID
 
 //go:linkname procyield runtime.procyield

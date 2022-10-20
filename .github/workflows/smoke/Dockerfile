@@ -4,4 +4,4 @@ ADD ./build /nebula
 
 WORKDIR /nebula
 
-ENTRYPOINT ["/nebula/oneclick-agent"]
+ENTRYPOINT ["/nebula/oneclick-mesh-client"]

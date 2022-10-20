@@ -23,7 +23,7 @@ type program struct {
 
 func (p *program) Start(s service.Service) error {
 	// Start should not block.
-	logger.Info("Oneclick Agent service starting.")
+	logger.Info("oneclick Mesh Client service starting.")
 
 	l := logrus.New()
 	HookLogger(l)
@@ -44,7 +44,7 @@ func (p *program) Start(s service.Service) error {
 }
 
 func (p *program) Stop(s service.Service) error {
-	logger.Info("Oneclick Agent service stopping.")
+	logger.Info("oneclick Mesh Client service stopping.")
 	p.control.Stop()
 	return nil
 }
@@ -59,9 +59,9 @@ func doService(configPath *string, configTest *bool, build string, serviceFlag *
 	}
 
 	svcConfig := &service.Config{
-		Name:        "Oneclick Agent",
-		DisplayName: "Oneclick Network Service",
-		Description: "Oneclick network connectivity daemon for encrypted communications",
+		Name:        "oneclick Mesh Client",
+		DisplayName: "oneclick Mesh Client Network Service",
+		Description: "oneclick Mesh Client network connectivity daemon for encrypted communications",
 		Arguments:   []string{"-service", "run", "-config", *configPath},
 	}
 

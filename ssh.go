@@ -258,7 +258,7 @@ func attachCommands(l *logrus.Logger, c *config.C, ssh *sshd.SSHServer, hostMap 
 
 	ssh.RegisterCommand(&sshd.Command{
 		Name:             "version",
-		ShortDescription: "Prints the currently running version of oneclick agent",
+		ShortDescription: "Prints the currently running version of oneclick Mesh Client",
 		Callback: func(fs interface{}, a []string, w sshd.StringWriter) error {
 			return sshVersion(ifce, fs, a, w)
 		},

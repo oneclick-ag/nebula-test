@@ -190,7 +190,7 @@ func (f *Interface) activate() {
 
 	f.l.WithField("interface", f.inside.Name()).WithField("network", f.inside.Cidr().String()).
 		WithField("build", f.version).WithField("udpAddr", addr).
-		Info("Oneclick Agent interface is active")
+		Info("oneclick Mesh Client interface is active")
 
 	metrics.GetOrRegisterGauge("routines", nil).Update(int64(f.routines))
 

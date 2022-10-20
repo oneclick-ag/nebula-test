@@ -191,7 +191,7 @@ func (r *R) renderFlow() {
 		sanAddr := strings.Replace(addr, ":", "#58;", 1)
 		participantsVals = append(participantsVals, sanAddr)
 		fmt.Fprintf(
-			f, "    participant %s as Oneclick agent: %s<br/>UDP: %s\n",
+			f, "    participant %s as oneclick Mesh Client: %s<br/>UDP: %s\n",
 			sanAddr, e.packet.from.GetVpnIp(), sanAddr,
 		)
 	}

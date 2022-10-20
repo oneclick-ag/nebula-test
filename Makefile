@@ -69,31 +69,31 @@ e2evvvv: e2ev
 e2e-bench: TEST_FLAGS = -bench=. -benchmem -run=^$
 e2e-bench: e2e
 
-all: $(ALL:%=build/%/oneclick-agent) $(ALL:%=build/%/oneclick-agent-cert)
+all: $(ALL:%=build/%/oneclick-mesh-client) $(ALL:%=build/%/oneclick-mesh-client-cert)
 
-release: $(ALL:%=build/oneclick-agent-%.tar.gz)
+release: $(ALL:%=build/oneclick-mesh-client-%.tar.gz)
 
-release-linux: $(ALL_LINUX:%=build/oneclick-agent-%.tar.gz)
+release-linux: $(ALL_LINUX:%=build/oneclick-mesh-client-%.tar.gz)
 
-release-freebsd: build/oneclick-agent-freebsd-amd64.tar.gz
+release-freebsd: build/oneclick-mesh-client-freebsd-amd64.tar.gz
 
 BUILD_ARGS = -trimpath
 
-bin-windows: build/windows-amd64/oneclick-agent.exe build/windows-amd64/oneclick-agent-cert.exe
+bin-windows: build/windows-amd64/oneclick-mesh-client.exe build/windows-amd64/oneclick-mesh-client-cert.exe
 	mv $? .
 
-bin-windows-arm64: build/windows-arm64/oneclick-agent.exe build/windows-arm64/oneclick-agent-cert.exe
+bin-windows-arm64: build/windows-arm64/oneclick-mesh-client.exe build/windows-arm64/oneclick-mesh-client-cert.exe
 	mv $? .
 
-bin-darwin: build/darwin-amd64/oneclick-agent build/darwin-amd64/oneclick-agent-cert
+bin-darwin: build/darwin-amd64/oneclick-mesh-client build/darwin-amd64/oneclick-mesh-client-cert
 	mv $? .
 
-bin-freebsd: build/freebsd-amd64/oneclick-agent build/freebsd-amd64/oneclick-agent-cert
+bin-freebsd: build/freebsd-amd64/oneclick-mesh-client build/freebsd-amd64/oneclick-mesh-client-cert
 	mv $? .
 
 bin:
-	go build $(BUILD_ARGS) -ldflags "$(LDFLAGS)" -o ./oneclick-agent${NEBULA_CMD_SUFFIX} ${NEBULA_CMD_PATH}
-	go build $(BUILD_ARGS) -ldflags "$(LDFLAGS)" -o ./oneclick-agent-cert${NEBULA_CMD_SUFFIX} ./cmd/nebula-cert
+	go build $(BUILD_ARGS) -ldflags "$(LDFLAGS)" -o ./oneclick-mesh-client${NEBULA_CMD_SUFFIX} ${NEBULA_CMD_PATH}
+	go build $(BUILD_ARGS) -ldflags "$(LDFLAGS)" -o ./oneclick-mesh-client-cert${NEBULA_CMD_SUFFIX} ./cmd/nebula-cert
 
 install:
 	go install $(BUILD_ARGS) -ldflags "$(LDFLAGS)" ${NEBULA_CMD_PATH}
@@ -105,27 +105,27 @@ build/linux-mips-%: GOENV += GOMIPS=$(word 3, $(subst -, ,$*))
 # Build an extra small binary for mips-softfloat
 build/linux-mips-softfloat/%: LDFLAGS += -s -w
 
-build/%/oneclick-agent: .FORCE
+build/%/oneclick-mesh-client: .FORCE
 	GOOS=$(firstword $(subst -, , $*)) \
 		GOARCH=$(word 2, $(subst -, ,$*)) $(GOENV) \
 		go build $(BUILD_ARGS) -o $@ -ldflags "$(LDFLAGS)" ${NEBULA_CMD_PATH}
 
-build/%/oneclick-agent-cert: .FORCE
+build/%/oneclick-mesh-client-cert: .FORCE
 	GOOS=$(firstword $(subst -, , $*)) \
 		GOARCH=$(word 2, $(subst -, ,$*)) $(GOENV) \
 		go build $(BUILD_ARGS) -o $@ -ldflags "$(LDFLAGS)" ./cmd/nebula-cert
 
-build/%/oneclick-agent.exe: build/%/oneclick-agent
+build/%/oneclick-mesh-client.exe: build/%/oneclick-mesh-client
 	mv $< $@
 
-build/%/oneclick-agent-cert.exe: build/%/oneclick-agent-cert
+build/%/oneclick-mesh-client-cert.exe: build/%/oneclick-mesh-client-cert
 	mv $< $@
 
-build/oneclick-agent-%.tar.gz: build/%/oneclick-agent build/%/oneclick-agent-cert
-	tar -zcv -C build/$* -f $@ oneclick-agent oneclick-agent-cert
+build/oneclick-mesh-client-%.tar.gz: build/%/oneclick-mesh-client build/%/oneclick-mesh-client-cert
+	tar -zcv -C build/$* -f $@ oneclick-mesh-client oneclick-mesh-client-cert
 
-build/oneclick-agent-%.zip: build/%/oneclick-agent.exe build/%/oneclick-agent-cert.exe
-	cd build/$* && zip ../oneclick-agent-$*.zip oneclick-agent.exe oneclick-agent-cert.exe
+build/oneclick-mesh-client-%.zip: build/%/oneclick-mesh-client.exe build/%/oneclick-mesh-client-cert.exe
+	cd build/$* && zip ../oneclick-mesh-client-$*.zip oneclick-mesh-client.exe oneclick-mesh-client-cert.exe
 
 vet:
 	go vet -v ./...
@@ -165,7 +165,7 @@ ifeq ($(words $(MAKECMDGOALS)),1)
 	@$(MAKE) service ${.DEFAULT_GOAL} --no-print-directory
 endif
 
-bin-docker: bin build/linux-amd64/oneclick-agent build/linux-amd64/oneclick-agent-cert
+bin-docker: bin build/linux-amd64/oneclick-mesh-client build/linux-amd64/oneclick-mesh-client-cert
 
 smoke-docker: bin-docker
 	cd .github/workflows/smoke/ && ./build.sh
