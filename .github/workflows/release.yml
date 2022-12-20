@@ -101,8 +101,10 @@ jobs:
             codesign -s "F2C1E03492179A729ABB455D7E181B7F4E2E0334" -f -v --timestamp --options=runtime -i "oneclick.oneclick-mesh-client-cert" ./release/oneclick-mesh-client-cert
           fi
           zip -j release/oneclick-mesh-client-darwin.zip release/oneclick-mesh-client-cert release/oneclick-mesh-client
+          zip -j release/oneclick-mesh-client-only-darwin.zip release/oneclick-mesh-client
           if [ -n "$AC_USERNAME" ]; then
             xcrun notarytool submit ./release/oneclick-mesh-client-darwin.zip --team-id "6F8PY896LX" --apple-id "$AC_USERNAME" --password "$AC_PASSWORD" --wait
+            xcrun notarytool submit ./release/oneclick-mesh-client-only-darwin.zip --team-id "6F8PY896LX" --apple-id "$AC_USERNAME" --password "$AC_PASSWORD" --wait
           fi
 
       - name: Upload artifacts
@@ -196,6 +198,16 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./darwin-latest/oneclick-mesh-client-darwin.zip
           asset_name: oneclick-mesh-client-darwin.zip
+          asset_content_type: application/zip
+
+      - name: Upload darwin zip agent only
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./darwin-latest/oneclick-mesh-client-only-darwin.zip
+          asset_name: oneclick-mesh-client-only-darwin.zip
           asset_content_type: application/zip
 
       - name: Upload windows-amd64
