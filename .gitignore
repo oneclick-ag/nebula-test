@@ -19,3 +19,8 @@
 /*.tar.gz
 /.vscode
 /e2e/mermaid/
+**.crt
+**.key
+**.pem
+!/examples/quickstart-vagrant/ansible/roles/nebula/files/vagrant-test-ca.key
+!/examples/quickstart-vagrant/ansible/roles/nebula/files/vagrant-test-ca.crt
