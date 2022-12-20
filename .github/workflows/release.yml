@@ -97,8 +97,8 @@ jobs:
           lipo -create -output ./release/oneclick-mesh-client ./build/darwin-amd64/oneclick-mesh-client ./build/darwin-arm64/oneclick-mesh-client
           lipo -create -output ./release/oneclick-mesh-client-cert ./build/darwin-amd64/oneclick-mesh-client-cert ./build/darwin-arm64/oneclick-mesh-client-cert
           if [ -n "$AC_USERNAME" ]; then
-            codesign -s "73E61C89083BB124F2B51FB39CE0C8F4371C6C60" -f -v --timestamp --options=runtime -i "net.defined.oneclick-mesh-client" ./release/oneclick-mesh-client
-            codesign -s "73E61C89083BB124F2B51FB39CE0C8F4371C6C60" -f -v --timestamp --options=runtime -i "net.defined.oneclick-mesh-client-cert" ./release/oneclick-mesh-client-cert
+            codesign -s "F2C1E03492179A729ABB455D7E181B7F4E2E0334" -f -v --timestamp --options=runtime -i "oneclick.oneclick-mesh-client" ./release/oneclick-mesh-client
+            codesign -s "F2C1E03492179A729ABB455D7E181B7F4E2E0334" -f -v --timestamp --options=runtime -i "oneclick.oneclick-mesh-client-cert" ./release/oneclick-mesh-client-cert
           fi
           zip -j release/oneclick-mesh-client-darwin.zip release/oneclick-mesh-client-cert release/oneclick-mesh-client
           if [ -n "$AC_USERNAME" ]; then
