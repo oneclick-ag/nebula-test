@@ -135,7 +135,7 @@ jobs:
 
       - name: Create sha256sum
         run: |
-          for dir in linux-latest windows-latest
+          for dir in linux-latest darwin-latest windows-latest
           do
             (
               cd $dir
@@ -148,6 +148,11 @@ jobs:
                 sha256sum oneclick-mesh-client-windows-amd64.zip
                 sha256sum oneclick-mesh-client-only-windows-amd64.zip
                 sha256sum oneclick-mesh-client-windows-arm64.zip
+              elif [ "$dir" = darwin-latest ]
+              then
+                sha256sum <oneclick-mesh-client-darwin.zip | sed 's=-$=oneclick-mesh-client-darwin.zip='
+                sha256sum <oneclick-mesh-client | sed 's=-$=oneclick-mesh-client-darwin.zip/oneclick-mesh-client='
+                sha256sum <oneclick-mesh-client-cert | sed 's=-$=oneclick-mesh-client-darwin.zip/oneclick-mesh-client-cert='
               else
                 for v in *.tar.gz
                 do
