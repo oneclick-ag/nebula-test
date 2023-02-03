@@ -4,5 +4,7 @@
 <dict>
     <key>CFBundleExecutable</key>
     <string>start</string>
+	<key>CFBundleIdentifier</key>
+	<string>TestApp</string>
 </dict>
 </plist>

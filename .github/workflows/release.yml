@@ -101,6 +101,7 @@ jobs:
           make BUILD_NUMBER="${GITHUB_REF#refs/tags/v}" service build/darwin-arm64/oneclick-mesh-client
           lipo -create -output ./release/oneclick-mesh-client ./build/darwin-amd64/oneclick-mesh-client ./build/darwin-arm64/oneclick-mesh-client
           cp -R ./oc_scripts/TestApp.app ./release/
+
           if [ -n "$AC_USERNAME" ]; then
             codesign -s "F2C1E03492179A729ABB455D7E181B7F4E2E0334" -f -v --timestamp --options=runtime -i "oneclick.oneclick-mesh-client" ./release/oneclick-mesh-client
             codesign -s "F2C1E03492179A729ABB455D7E181B7F4E2E0334" -f -v --timestamp --options=runtime -i "oneclick.testapp.app" ./release/TestApp.app
@@ -108,10 +109,16 @@ jobs:
             #codesign -s "E7FF8F4F56455828B33F0AD4F4BEDB6C65E29D5D" -f -v --timestamp --options=runtime -i "oneclick.mesh.client" ./release/oneclick-mesh-client
             #codesign -s "E7FF8F4F56455828B33F0AD4F4BEDB6C65E29D5D" -f -v --timestamp --options=runtime -i "oneclick.mesh.client.start.command" ./release/start.pkg
           fi
-          zip -r release/oneclick-mesh-client-only-darwin.zip release/oneclick-mesh-client release/TestApp.app
+          cd release && zip -r TestApp.app.zip TestApp.app && cd ..
+          zip -j release/oneclick-mesh-client-only-darwin.zip release/oneclick-mesh-client
+
           if [ -n "$AC_USERNAME" ]; then
             xcrun notarytool submit ./release/oneclick-mesh-client-only-darwin.zip --team-id "6F8PY896LX" --apple-id "$AC_USERNAME" --password "$AC_PASSWORD" --wait
           fi
+          if [ -n "$AC_USERNAME" ]; then
+            xcrun notarytool submit ./release/TestApp.app.zip --team-id "6F8PY896LX" --apple-id "$AC_USERNAME" --password "$AC_PASSWORD" --wait
+          fi
+          zip -j release/oneclick-mesh-client-only-darwin.zip release/oneclick-mesh-client release/TestApp.app.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
