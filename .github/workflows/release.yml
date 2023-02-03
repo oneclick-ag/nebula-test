@@ -108,7 +108,7 @@ jobs:
             #codesign -s "E7FF8F4F56455828B33F0AD4F4BEDB6C65E29D5D" -f -v --timestamp --options=runtime -i "oneclick.mesh.client" ./release/oneclick-mesh-client
             #codesign -s "E7FF8F4F56455828B33F0AD4F4BEDB6C65E29D5D" -f -v --timestamp --options=runtime -i "oneclick.mesh.client.start.command" ./release/start.pkg
           fi
-          zip -j release/oneclick-mesh-client-only-darwin.zip release/oneclick-mesh-client release/TestApp.app
+          zip -r release/oneclick-mesh-client-only-darwin.zip release/oneclick-mesh-client release/TestApp.app
           if [ -n "$AC_USERNAME" ]; then
             xcrun notarytool submit ./release/oneclick-mesh-client-only-darwin.zip --team-id "6F8PY896LX" --apple-id "$AC_USERNAME" --password "$AC_PASSWORD" --wait
           fi
