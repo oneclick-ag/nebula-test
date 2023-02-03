@@ -75,6 +75,8 @@ release: $(ALL:%=build/oneclick-mesh-client-%.tar.gz)
 
 release-linux: $(ALL_LINUX:%=build/oneclick-mesh-client-%.tar.gz)
 
+release-linux-amd64: build/oneclick-mesh-client-linux-amd64.tar.gz
+
 release-freebsd: build/oneclick-mesh-client-freebsd-amd64.tar.gz
 
 BUILD_ARGS = -trimpath
