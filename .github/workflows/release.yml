@@ -79,6 +79,7 @@ jobs:
         with:
           p12-file-base64: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_P12_BASE64 }}
           p12-password: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_PASSWORD }}
+          keychain-password: keychain-password
 
       - name: Import installer certificate
         if: env.HAS_SIGNING_CREDS == 'true'
@@ -87,6 +88,7 @@ jobs:
           create-keychain: false
           p12-file-base64: ${{ secrets.APPLE_INSTALLER_CERTIFICATE_P12_BASE64 }}
           p12-password: ${{ secrets.APPLE_INSTALLER_CERTIFICATE_PASSWORD }}
+          keychain-password: keychain-password
 
       - name: Build, sign, and notarize
         env:
