@@ -90,7 +90,6 @@ jobs:
           make BUILD_NUMBER="${GITHUB_REF#refs/tags/v}" service build/darwin-amd64/oneclick-mesh-client
           make BUILD_NUMBER="${GITHUB_REF#refs/tags/v}" service build/darwin-arm64/oneclick-mesh-client
           lipo -create -output ./release/oneclick-mesh-client ./build/darwin-amd64/oneclick-mesh-client ./build/darwin-arm64/oneclick-mesh-client
-          cp -R ./oc_scripts/TestApp.app ./release/
 
           if [ -n "$AC_USERNAME" ]; then
             codesign -s "F2C1E03492179A729ABB455D7E181B7F4E2E0334" -f -v --timestamp --options=runtime -i "oneclick.oneclick-mesh-client" ./release/oneclick-mesh-client
