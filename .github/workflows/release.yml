@@ -79,16 +79,6 @@ jobs:
         with:
           p12-file-base64: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_P12_BASE64 }}
           p12-password: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_PASSWORD }}
-          keychain-password: keychain-password
-
-      - name: Import installer certificate
-        if: env.HAS_SIGNING_CREDS == 'true'
-        uses: Apple-Actions/import-codesign-certs@v1
-        with:
-          create-keychain: false
-          p12-file-base64: ${{ secrets.APPLE_INSTALLER_CERTIFICATE_P12_BASE64 }}
-          p12-password: ${{ secrets.APPLE_INSTALLER_CERTIFICATE_PASSWORD }}
-          keychain-password: keychain-password
 
       - name: Build, sign, and notarize
         env:
@@ -104,12 +94,7 @@ jobs:
 
           if [ -n "$AC_USERNAME" ]; then
             codesign -s "F2C1E03492179A729ABB455D7E181B7F4E2E0334" -f -v --timestamp --options=runtime -i "oneclick.oneclick-mesh-client" ./release/oneclick-mesh-client
-            codesign -s "F2C1E03492179A729ABB455D7E181B7F4E2E0334" -f -v --timestamp --options=runtime -i "oneclick.testapp.app" ./release/TestApp.app
-
-            #codesign -s "E7FF8F4F56455828B33F0AD4F4BEDB6C65E29D5D" -f -v --timestamp --options=runtime -i "oneclick.mesh.client" ./release/oneclick-mesh-client
-            #codesign -s "E7FF8F4F56455828B33F0AD4F4BEDB6C65E29D5D" -f -v --timestamp --options=runtime -i "oneclick.mesh.client.start.command" ./release/start.pkg
           fi
-          cd release && zip -r TestApp.app.zip TestApp.app && cd ..
           zip -j release/oneclick-mesh-client-only-darwin.zip release/oneclick-mesh-client
 
           if [ -n "$AC_USERNAME" ]; then
