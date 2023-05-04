@@ -181,6 +181,8 @@ bin-docker: bin build/linux-amd64/oneclick-mesh-client build/linux-amd64/oneclic
 smoke-docker: bin-docker
 	cd .github/workflows/smoke/ && ./build.sh
 	cd .github/workflows/smoke/ && ./smoke.sh
+	cd .github/workflows/smoke/ && NAME="smoke-p256" CURVE="P256" ./build.sh
+	cd .github/workflows/smoke/ && NAME="smoke-p256" ./smoke.sh
 
 smoke-relay-docker: bin-docker
 	cd .github/workflows/smoke/ && ./build-relay.sh
