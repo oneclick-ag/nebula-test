@@ -95,7 +95,7 @@ bin-darwin: build/darwin-amd64/oneclick-mesh-client build/darwin-amd64/oneclick-
 bin-freebsd: build/freebsd-amd64/oneclick-mesh-client build/freebsd-amd64/oneclick-mesh-client-cert
 	mv $? .
 
-bin-boringcrypto: build/linux-$(shell go env GOARCH)-boringcrypto/nebula build/linux-$(shell go env GOARCH)-boringcrypto/nebula-cert
+bin-boringcrypto: build/linux-$(shell go env GOARCH)-boringcrypto/oneclick-mesh-client build/linux-$(shell go env GOARCH)-boringcrypto/oneclick-mesh-client-cert
 	mv $? .
 
 bin:
