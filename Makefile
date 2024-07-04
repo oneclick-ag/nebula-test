@@ -227,7 +227,7 @@ smoke-docker-race: BUILD_ARGS = -race
 smoke-docker-race: CGO_ENABLED = 1
 smoke-docker-race: smoke-docker
 
-smoke-vagrant/%: bin-docker build/%/nebula
+smoke-vagrant/%: bin-docker build/%/oneclick-mesh-client
 	cd .github/workflows/smoke/ && ./build.sh $*
 	cd .github/workflows/smoke/ && ./smoke-vagrant.sh $*
 
