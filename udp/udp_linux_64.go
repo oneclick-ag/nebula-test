@@ -1,6 +1,6 @@
-//go:build linux && (amd64 || arm64 || ppc64 || ppc64le || mips64 || mips64le || s390x || riscv64) && !android && !e2e_testing
+//go:build linux && (amd64 || arm64 || ppc64 || ppc64le || mips64 || mips64le || s390x || riscv64 || loong64) && !android && !e2e_testing
 // +build linux
-// +build amd64 arm64 ppc64 ppc64le mips64 mips64le s390x riscv64
+// +build amd64 arm64 ppc64 ppc64le mips64 mips64le s390x riscv64 loong64
 // +build !android
 // +build !e2e_testing
 
@@ -33,7 +33,7 @@ type rawMessage struct {
 	Pad0 [4]byte
 }
 
-func (u *Conn) PrepareRawMessages(n int) ([]rawMessage, [][]byte, [][]byte) {
+func (u *StdConn) PrepareRawMessages(n int) ([]rawMessage, [][]byte, [][]byte) {
 	msgs := make([]rawMessage, n)
 	buffers := make([][]byte, n)
 	names := make([][]byte, n)

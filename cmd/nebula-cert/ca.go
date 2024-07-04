@@ -7,7 +7,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math"
 	"net"
 	"os"
@@ -181,9 +180,15 @@ func ca(args []string, out io.Writer, errOut io.Writer, pr PasswordReader) error
 		if err != nil {
 			return fmt.Errorf("error while generating ecdsa keys: %s", err)
 		}
-		// ref: https://github.com/golang/go/blob/go1.19/src/crypto/x509/sec1.go#L60
-		rawPriv = key.D.FillBytes(make([]byte, 32))
-		pub = elliptic.Marshal(elliptic.P256(), key.X, key.Y)
+
+		// ecdh.PrivateKey lets us get at the encoded bytes, even though
+		// we aren't using ECDH here.
+		eKey, err := key.ECDH()
+		if err != nil {
+			return fmt.Errorf("error while converting ecdsa key: %s", err)
+		}
+		rawPriv = eKey.Bytes()
+		pub = eKey.PublicKey().Bytes()
 	}
 
 	nc := cert.NebulaCertificate{
@@ -213,27 +218,27 @@ func ca(args []string, out io.Writer, errOut io.Writer, pr PasswordReader) error
 		return fmt.Errorf("error while signing: %s", err)
 	}
 
+	var b []byte
 	if *cf.encryption {
-		b, err := cert.EncryptAndMarshalSigningPrivateKey(curve, rawPriv, passphrase, kdfParams)
+		b, err = cert.EncryptAndMarshalSigningPrivateKey(curve, rawPriv, passphrase, kdfParams)
 		if err != nil {
 			return fmt.Errorf("error while encrypting out-key: %s", err)
 		}
-
-		err = ioutil.WriteFile(*cf.outKeyPath, b, 0600)
 	} else {
-		err = ioutil.WriteFile(*cf.outKeyPath, cert.MarshalSigningPrivateKey(curve, rawPriv), 0600)
+		b = cert.MarshalSigningPrivateKey(curve, rawPriv)
 	}
 
+	err = os.WriteFile(*cf.outKeyPath, b, 0600)
 	if err != nil {
 		return fmt.Errorf("error while writing out-key: %s", err)
 	}
 
-	b, err := nc.MarshalToPEM()
+	b, err = nc.MarshalToPEM()
 	if err != nil {
 		return fmt.Errorf("error while marshalling certificate: %s", err)
 	}
 
-	err = ioutil.WriteFile(*cf.outCertPath, b, 0600)
+	err = os.WriteFile(*cf.outCertPath, b, 0600)
 	if err != nil {
 		return fmt.Errorf("error while writing out-crt: %s", err)
 	}
@@ -244,7 +249,7 @@ func ca(args []string, out io.Writer, errOut io.Writer, pr PasswordReader) error
 			return fmt.Errorf("error while generating qr code: %s", err)
 		}
 
-		err = ioutil.WriteFile(*cf.outQRPath, b, 0600)
+		err = os.WriteFile(*cf.outQRPath, b, 0600)
 		if err != nil {
 			return fmt.Errorf("error while writing out-qr: %s", err)
 		}

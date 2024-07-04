@@ -23,7 +23,7 @@ as the specific error condition.
 - `udpIp` - a udp ip address
 - `vpnIp` - vpn ip of the host (remote or local)
 - `relay` - the vpnIp of the relay host that is or should be handling the relay packet
-- `relayFrom` - The vpnIp of the initial sender of the relayed packet 
+- `relayFrom` - The vpnIp of the initial sender of the relayed packet
 - `relayTo` - The vpnIp of the final destination of a relayed packet
 
 #### Example:
@@ -33,6 +33,5 @@ l.WithError(err).
     WithField("vpnIp", IntIp(hostinfo.hostId)).
     WithField("udpAddr", addr).
     WithField("handshake", m{"stage": 1, "style": "ix"}).
-    WithField("cert", remoteCert).
     Info("Invalid certificate from host")
 ```

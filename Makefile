@@ -1,20 +1,14 @@
-GOMINVERSION = 1.20
 NEBULA_CMD_PATH = "./cmd/nebula"
-GO111MODULE = on
-export GO111MODULE
 CGO_ENABLED = 0
 export CGO_ENABLED
 
 # Set up OS specific bits
 ifeq ($(OS),Windows_NT)
-	#TODO: we should be able to ditch awk as well
-	GOVERSION := $(shell go version | awk "{print substr($$3, 3)}")
-	GOISMIN := $(shell IF "$(GOVERSION)" GEQ "$(GOMINVERSION)" ECHO 1)
 	NEBULA_CMD_SUFFIX = .exe
 	NULL_FILE = nul
+	# RIO on windows does pointer stuff that makes go vet angry
+	VET_FLAGS = -unsafeptr=false
 else
-	GOVERSION := $(shell go version | awk '{print substr($$3, 3)}')
-	GOISMIN := $(shell expr "$(GOVERSION)" ">=" "$(GOMINVERSION)")
 	NEBULA_CMD_SUFFIX =
 	NULL_FILE = /dev/null
 endif
@@ -27,6 +21,9 @@ ifndef BUILD_NUMBER
 		BUILD_NUMBER = $(shell git describe --exact-match --dirty | cut -dv -f2)
 	endif
 endif
+
+DOCKER_IMAGE_REPO ?= nebulaoss/nebula
+DOCKER_IMAGE_TAG ?= latest
 
 LDFLAGS = -X main.Build=$(BUILD_NUMBER)
 
@@ -42,12 +39,24 @@ ALL_LINUX = linux-amd64 \
 	linux-mips64 \
 	linux-mips64le \
 	linux-mips-softfloat \
-	linux-riscv64
+	linux-riscv64 \
+        linux-loong64
+
+ALL_FREEBSD = freebsd-amd64 \
+	freebsd-arm64
+
+ALL_OPENBSD = openbsd-amd64 \
+	openbsd-arm64
+
+ALL_NETBSD = netbsd-amd64 \
+ 	netbsd-arm64
 
 ALL = $(ALL_LINUX) \
+	$(ALL_FREEBSD) \
+	$(ALL_OPENBSD) \
+	$(ALL_NETBSD) \
 	darwin-amd64 \
 	darwin-arm64 \
-	freebsd-amd64 \
 	windows-amd64 \
 	windows-arm64
 
@@ -69,7 +78,11 @@ e2evvvv: e2ev
 e2e-bench: TEST_FLAGS = -bench=. -benchmem -run=^$
 e2e-bench: e2e
 
+DOCKER_BIN = build/linux-amd64/oneclick-mesh-client build/linux-amd64/oneclick-mesh-client-cert
+
 all: $(ALL:%=build/%/oneclick-mesh-client) $(ALL:%=build/%/oneclick-mesh-client-cert)
+
+docker: docker/linux-$(shell go env GOARCH)
 
 release: $(ALL:%=build/oneclick-mesh-client-%.tar.gz)
 
@@ -77,7 +90,11 @@ release-linux: $(ALL_LINUX:%=build/oneclick-mesh-client-%.tar.gz)
 
 release-linux-amd64: build/oneclick-mesh-client-linux-amd64.tar.gz
 
-release-freebsd: build/oneclick-mesh-client-freebsd-amd64.tar.gz
+release-freebsd: $(ALL_FREEBSD:%=build/oneclick-mesh-client-%.tar.gz)
+
+release-openbsd: $(ALL_OPENBSD:%=build/oneclick-mesh-client-%.tar.gz)
+
+release-netbsd: $(ALL_NETBSD:%=build/oneclick-mesh-client-%.tar.gz)
 
 release-boringcrypto: build/nebula-linux-$(shell go env GOARCH)-boringcrypto.tar.gz
 
@@ -96,6 +113,12 @@ bin-freebsd: build/freebsd-amd64/oneclick-mesh-client build/freebsd-amd64/onecli
 	mv $? .
 
 bin-boringcrypto: build/linux-$(shell go env GOARCH)-boringcrypto/oneclick-mesh-client build/linux-$(shell go env GOARCH)-boringcrypto/oneclick-mesh-client-cert
+	mv $? .
+
+bin-freebsd-arm64: build/freebsd-arm64/nebula build/freebsd-arm64/nebula-cert
+	mv $? .
+
+bin-boringcrypto: build/linux-$(shell go env GOARCH)-boringcrypto/nebula build/linux-$(shell go env GOARCH)-boringcrypto/nebula-cert
 	mv $? .
 
 bin:
@@ -138,8 +161,11 @@ build/oneclick-mesh-client-%.tar.gz: build/%/oneclick-mesh-client build/%/onecli
 build/oneclick-mesh-client-%.zip: build/%/oneclick-mesh-client.exe build/%/oneclick-mesh-client-cert.exe
 	cd build/$* && zip ../oneclick-mesh-client-$*.zip oneclick-mesh-client.exe oneclick-mesh-client-cert.exe
 
+docker/%: build/%/nebula build/%/nebula-cert
+	docker build . $(DOCKER_BUILD_ARGS) -f docker/Dockerfile --platform "$(subst -,/,$*)" --tag "${DOCKER_IMAGE_REPO}:${DOCKER_IMAGE_TAG}" --tag "${DOCKER_IMAGE_REPO}:$(BUILD_NUMBER)"
+
 vet:
-	go vet -v ./...
+	go vet $(VET_FLAGS) -v ./...
 
 test:
 	go test -v ./...
@@ -150,6 +176,12 @@ test-boringcrypto:
 test-cov-html:
 	go test -coverprofile=coverage.out
 	go tool cover -html=coverage.out
+
+build-test-mobile:
+	GOARCH=amd64 GOOS=ios go build $(shell go list ./... | grep -v '/cmd/\|/examples/')
+	GOARCH=arm64 GOOS=ios go build $(shell go list ./... | grep -v '/cmd/\|/examples/')
+	GOARCH=amd64 GOOS=android go build $(shell go list ./... | grep -v '/cmd/\|/examples/')
+	GOARCH=arm64 GOOS=android go build $(shell go list ./... | grep -v '/cmd/\|/examples/')
 
 bench:
 	go test -bench=.
@@ -192,8 +224,13 @@ smoke-relay-docker: bin-docker
 	cd .github/workflows/smoke/ && ./smoke-relay.sh
 
 smoke-docker-race: BUILD_ARGS = -race
+smoke-docker-race: CGO_ENABLED = 1
 smoke-docker-race: smoke-docker
 
+smoke-vagrant/%: bin-docker build/%/nebula
+	cd .github/workflows/smoke/ && ./build.sh $*
+	cd .github/workflows/smoke/ && ./smoke-vagrant.sh $*
+
 .FORCE:
-.PHONY: e2e e2ev e2evv e2evvv e2evvvv test test-cov-html bench bench-cpu bench-cpu-long bin proto release service smoke-docker smoke-docker-race
+.PHONY: bench bench-cpu bench-cpu-long bin build-test-mobile e2e e2ev e2evv e2evvv e2evvvv proto release service smoke-docker smoke-docker-race test test-cov-html smoke-vagrant/%
 .DEFAULT_GOAL := bin
