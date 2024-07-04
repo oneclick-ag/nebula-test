@@ -13,7 +13,7 @@ mkdir ./build
 
     if [ "$1" ]
     then
-        cp "../../../../build/$1/nebula" "$1-nebula"
+        cp "../../../../build/$1/oneclick-mesh-client" "$1-oneclick-mesh-client"
     fi
 
     HOST="lighthouse1" \
