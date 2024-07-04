@@ -29,13 +29,13 @@ docker run --name lighthouse1 --rm "$CONTAINER" -config lighthouse1.yml -test
 docker run --name host2 --rm "$CONTAINER" -config host2.yml -test
 
 vagrant up
-vagrant ssh -c "cd /nebula && /nebula/$1-nebula -config host3.yml -test"
+vagrant ssh -c "cd /nebula && /nebula/$1-oneclick-mesh-client -config host3.yml -test"
 
 docker run --name lighthouse1 --device /dev/net/tun:/dev/net/tun --cap-add NET_ADMIN --rm "$CONTAINER" -config lighthouse1.yml 2>&1 | tee logs/lighthouse1 | sed -u 's/^/  [lighthouse1]  /' &
 sleep 1
 docker run --name host2 --device /dev/net/tun:/dev/net/tun --cap-add NET_ADMIN --rm "$CONTAINER" -config host2.yml 2>&1 | tee logs/host2 | sed -u 's/^/  [host2]  /' &
 sleep 1
-vagrant ssh -c "cd /nebula && sudo sh -c 'echo \$\$ >/nebula/pid && exec /nebula/$1-nebula -config host3.yml'" &
+vagrant ssh -c "cd /nebula && sudo sh -c 'echo \$\$ >/nebula/pid && exec /nebula/$1-oneclick-mesh-client -config host3.yml'" &
 sleep 15
 
 # grab tcpdump pcaps for debugging
