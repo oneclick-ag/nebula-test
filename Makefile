@@ -96,7 +96,7 @@ release-openbsd: $(ALL_OPENBSD:%=build/oneclick-mesh-client-%.tar.gz)
 
 release-netbsd: $(ALL_NETBSD:%=build/oneclick-mesh-client-%.tar.gz)
 
-release-boringcrypto: build/nebula-linux-$(shell go env GOARCH)-boringcrypto.tar.gz
+release-boringcrypto: build/oneclick-mesh-client-linux-$(shell go env GOARCH)-boringcrypto.tar.gz
 
 BUILD_ARGS = -trimpath
 
@@ -112,13 +112,10 @@ bin-darwin: build/darwin-amd64/oneclick-mesh-client build/darwin-amd64/oneclick-
 bin-freebsd: build/freebsd-amd64/oneclick-mesh-client build/freebsd-amd64/oneclick-mesh-client-cert
 	mv $? .
 
+bin-freebsd-arm64: build/freebsd-arm64/oneclick-mesh-client build/freebsd-arm64/oneclick-mesh-client-cert
+	mv $? .
+
 bin-boringcrypto: build/linux-$(shell go env GOARCH)-boringcrypto/oneclick-mesh-client build/linux-$(shell go env GOARCH)-boringcrypto/oneclick-mesh-client-cert
-	mv $? .
-
-bin-freebsd-arm64: build/freebsd-arm64/nebula build/freebsd-arm64/nebula-cert
-	mv $? .
-
-bin-boringcrypto: build/linux-$(shell go env GOARCH)-boringcrypto/nebula build/linux-$(shell go env GOARCH)-boringcrypto/nebula-cert
 	mv $? .
 
 bin:
@@ -161,7 +158,7 @@ build/oneclick-mesh-client-%.tar.gz: build/%/oneclick-mesh-client build/%/onecli
 build/oneclick-mesh-client-%.zip: build/%/oneclick-mesh-client.exe build/%/oneclick-mesh-client-cert.exe
 	cd build/$* && zip ../oneclick-mesh-client-$*.zip oneclick-mesh-client.exe oneclick-mesh-client-cert.exe
 
-docker/%: build/%/nebula build/%/nebula-cert
+docker/%: build/%/oneclick-mesh-client build/%/oneclick-mesh-client-cert
 	docker build . $(DOCKER_BUILD_ARGS) -f docker/Dockerfile --platform "$(subst -,/,$*)" --tag "${DOCKER_IMAGE_REPO}:${DOCKER_IMAGE_TAG}" --tag "${DOCKER_IMAGE_REPO}:$(BUILD_NUMBER)"
 
 vet:
